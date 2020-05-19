@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>ARVIS | Supernova Robotics</title>
+		<meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <script src="/assets/js/utils.js"></script>
+    <script src="/assets/js/matmath.js"></script>
+    <style>
+      :root {
+        --grey-000: #000000;
+        --grey-200: #2A2A2A;
+        --grey-500: #808080;
+        --grey-1100: #D3D3D3;
+        --grey-1200: #FFFFFF;
+      }
+      body {
+        margin: 0;
+        background: #060309;
+      }
+      
+
+      .window {
+        display: flex;
+        width: 100%;
+      }
+      .window > * {
+        flex-grow: 1;
+      }
+      #driver_camera_DOM {
+        width: 32vw;
+        height: 24vw;
+      }
+      
+      
+      #field_camera_DOM {
+        width: 50vw;
+        height: 50vh;
+      }
+      #Robot_code {
+        position: absolute;
+        z-index: 12;
+        border: 1px solid #d3d3d3;
+      }
+
+      #Robot_code-topbar {
+        padding: 10px;
+        cursor: move;
+        z-index: 10;
+        background: rgba(84, 27, 143, 0.6);
+        color: #fff;
+      }
+      #Robot_code_DOM {
+        margin: 0;
+        background: rgba(0, 0, 0, 0.8);
+        color: #FFF;
+        min-width: 40rem;
+        min-height: 5rem;
+        outline: none;
+      }
+      @keyframes fadeout {
+        0% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0;
+        }
+      }
+      
+      @keyframes loading {
+        0% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0 50%;
+        }
+      }
+      .loading {
+        width: 36vw;
+        border-radius: 1rem;
+        height: 1px;
+        margin: auto;
+        opacity: 0.8;
+        background: linear-gradient(100deg, #000 30%, #fff 50%, #000 70%);
+        background-size: 400%;
+        animation: loading 2s ease-in-out 0.5s infinite;
+      }
+      .intro {
+        position: absolute;
+        z-index: 24;
+        text-align: center;
+        top: 0; left: 0; bottom: 0; right: 0;
+        background: #000;
+        text-align: center;
+        font-family: "Microsoft YaHei Light", Helvetica, "Lucida Sans Unicode", "Lucida Grande", Tahoma, sans-serif;
+        font-weight: 100;
+        color: #FFF;
+      }
+      .intro .title {
+        margin-top: 36vh;
+        font-size: 5rem;
+        margin-bottom: 0.2rem;
+      }
+      .intro p {
+        margin-top: 1rem;
+        font-size: 0.75rem;
+      }
+
+
+      /* Driverstation */
+      .driverstation-panel {
+        position: absolute;
+        bottom: 0; left: 0;
+        display: flex;
+        width: 100vw;
+        height: 12rem;
+        background: #2A2A2A; 
+        color: #FFF;
+      }
+      .driverstation-panel button {
+        background: transparent;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        color: #FFF;
+        outline: none;
+      }
+      .driverstation-panel button:hover {
+        border-image: linear-gradient(to right, rgba(0, 0, 0, 0) 0%, rgba(255, 255, 255, 0.3) 50%, rgba(0, 0, 0, 0) 100%) 100% 1;
+        cursor: pointer;
+      }
+      .driverstation-panel button.selected {
+        border-image: linear-gradient(to right, rgba(0, 0, 0, 0) 0%, rgba(255, 255, 255, 0.9) 50%, rgba(0, 0, 0, 0) 100%) 100% 1;
+        background: rgba(0, 0, 0, 0.25);
+      }
+
+      .driverstation-panel > .tag {
+        display: flex;
+        flex-direction: column;
+        width: 2rem;
+        height: 100%;
+      }
+      .driverstation-panel > .tag > .item {
+        flex-grow: 1;
+        color: #FFF;
+      }
+
+      .driverstation-panel > .seperator {
+        height: 100%;
+        width: 1rem;
+      }
+
+      .driverstation-panel > .page {
+        width: 35vw;
+        background: #393939;
+      }
+
+      .driverstation-panel > #DSUI_page_0_DOM {
+        display: flex;
+        justify-content: space-evenly;
+      }
+      .driverstation-panel > #DSUI_page_0_DOM > .controls {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-evenly;
+        align-items: center;
+        width: 40%;
+      }
+
+      .driverstation-panel > #DSUI_page_0_DOM .mode-controls {
+        display: flex;
+        flex-direction: column;
+        width: 90%;
+      }
+      .driverstation-panel > #DSUI_page_0_DOM .mode-controls button {
+        font-size: 0.8rem;
+        height: 1.4rem;
+        text-align: left;
+      }
+
+      .driverstation-panel > #DSUI_page_0_DOM .enable-controls {
+        display: flex;
+        width: 90%;
+      }
+      .driverstation-panel > #DSUI_page_0_DOM .enable-controls button{
+        flex-grow: 1;
+        height: 4rem;
+      }
+      .driverstation-panel > #DSUI_page_0_DOM .enable-controls #DSUI_enable_btn_DOM {
+        color: #2EDC00;
+      }
+      .driverstation-panel > #DSUI_page_0_DOM .enable-controls #DSUI_disable_btn_DOM {
+        color: #FF0000;
+      }
+      .driverstation-panel > #DSUI_page_0_DOM .statistics {
+        width: 40%;
+        
+      }
+      .driverstation-panel > #DSUI_page_0_DOM .elapsed-time {
+        margin-top: 1rem;
+        font-weight: 100;
+      }
+      .driverstation-panel > #DSUI_page_0_DOM .elapsed-time #DSUI_elapsed_time_text_DOM {
+        font-size: 2rem;
+      }
+      .driverstation-panel > #DSUI_page_0_DOM .elapsed-time .text {
+        border-top: 1px solid #FFF;
+        border-image: linear-gradient(to right, rgba(0, 0, 0, 0) 0%, rgba(255, 255, 255, 0.9) 60%) 100% 1;
+        text-align: right;
+        font-size: 0.7rem;
+      }
+
+      .driverstation-panel > .content {
+        flex-grow: 1;
+      }
+      .driverstation-panel > .content > .info-panel {
+        display: flex;
+      }
+      .driverstation-panel > .content > .info-panel #DCUI_joystick_connection_light_DOM {
+        width: 1rem; height: 1rem;
+        display: inline-block;
+      }
+      .driverstation-panel > .content > .info-panel .robot-info .green {
+        background: #2EDC00;
+      }
+      .driverstation-panel > .content > .info-panel .robot-info .red {
+        background: #FF0000;
+      }
+
+
+    </style>
+	</head>
+
+	<body>
+    <div class="intro">
+      <p class="title">ARVISS</p>
+      <div class="loading"></div>
+      <p>A Rather Very Idiotic and Simplified Simulator - Supernova Robotics</p>
+    </div>
+    <div class="window">
+      <div class="field">
+        <canvas id="field_camera_DOM"></canvas>
+      </div>
+      <div class="driver">
+        <canvas id="driver_camera_DOM" width="320" height="240"></canvas>
+      </div>
+    </div>
+    <div class="driverstation-panel">
+      <div class="tag">
+        <div class="item"></div>
+        <div class="item"></div>
+        <div class="item"></div>
+        <div class="item"></div>
+      </div>
+      <div class="seperator"></div>
+      <div class="page" id="DSUI_page_0_DOM">
+        <div class="controls">
+          <div class="mode-controls">
+            <button id="DSUI_mode_select_btn_teleop_DOM" class="mode_select_btn selected">TeleOperated</button>
+            <button id="DSUI_mode_select_btn_auto_DOM" class="mode_select_btn">Autonomous</button>
+            <button id="DSUI_mode_select_btn_practice_DOM" class="mode_select_btn">Practice</button>
+            <button id="DSUI_mode_select_btn_test_DOM" class="mode_select_btn">Test</button>
+          </div>
+          <div class="enable-controls">
+            <button id="DSUI_enable_btn_DOM" class="">ENABLE</button>
+            <button id="DSUI_disable_btn_DOM" class="selected">DISABLE</button>
+          </div>
+        </div>
+        <div class="statistics">
+          <div class="elapsed-time">
+            <div id="DSUI_elapsed_time_text_DOM">00:00.00</div>
+            <div class="text">elapsed</div>
+          </div>
+        </div>
+      </div>
+      <div class="seperator"></div>
+      <div class="content">
+        <div class="info-panel">
+          <div class="team-number">#5451</div>
+          <div class="battery-info"></div>
+          <div class="robot-info">
+            <div class="joystick">joysticks<div id="DCUI_joystick_connection_light_DOM"></div></div>
+          </div>
+          <div class="robotcode-info"></div>
+        </div>
+        <div class="debug-panel"></div>
+      </div>
+    </div>
+    <div id="Robot_code">
+      <div id="Robot_code-topbar"></div>
+      <textarea id="Robot_code_DOM"></textarea>
+    </div>
+		<script type="module">
+
+      /**
+       * event sequence:
+       * 
+       * 0. intro screen on
+       * 1. initialize canvas and GL components
+       * 2. load field model; load bot model
+       * 3. when bot model loaded: initialize simulation and bind simulation to model; initialize bot camera; disable intro
+       * 4. enter loop
+      */
+
+
+      console.log("World coordinate:\n|z\n|\n|\n|______ y\n \\\n  \\\n   \\x");
+
+
+			import * as THREE from "/assets/js/three.module.js";
+
+			import {OrbitControls} from "/assets/js/OrbitControls.js";
+			import {GLTFLoader} from "/assets/js/GLTFLoader.js";
+			import {RGBELoader} from "/assets/js/RGBELoader.js";
+      import {RoughnessMipmapper} from "/assets/js/RoughnessMipmapper.js";
+      
+			import {OBJLoader} from "/assets/js/OBJLoader.js";
+			import {MTLLoader} from "/assets/js/MTLLoader.js";
+      import {DDSLoader} from "/assets/js/DDSLoader.js";
+      
+
+      import RobotSimulator from "/src/main/javascript/frc/Main.js";
+      import CallibProcessor from "/ga/supernovarobotics/first/spilibj/CallibProcessor.js";
+      window.CallibProcessor = CallibProcessor;
+
+			var container, controls;
+      var scene;
+      var cameras = [];
+      var renderers = {field: null, botcam: null};
+
+      var last_time = 0;
+
+      var global;
+      window.global = global;
+      var bot_object;
+
+      var simulation = new RobotSimulator();
+
+      console.log(simulation);
+      window.simulation = simulation;
+
+
+
+      //======== UI drivers ===
+      
+      var UI_helper = {};
+      
+      UI_helper.time_enabled = 0;
+
+      UI_helper.setEnabled = function(state) {
+        simulation.Robot._is_enabled = state;
+        if (state) {
+          UI_helper.time_enabled = last_time;
+          DSUI_enable_btn_DOM.classList.add("selected");
+          DSUI_disable_btn_DOM.classList.remove("selected");
+        }
+        else {
+          UI_helper.time_enabled = 0;
+          DSUI_elapsed_time_text_DOM.innerHTML = "00:00.00";
+          DSUI_enable_btn_DOM.classList.remove("selected");
+          DSUI_disable_btn_DOM.classList.add("selected");
+        }
+      }
+      DSUI_enable_btn_DOM.addEventListener("click", function(e) {
+        UI_helper.setEnabled(true);
+      });
+      DSUI_disable_btn_DOM.addEventListener("click", function(e) {
+        UI_helper.setEnabled(false);
+      });
+      window.addEventListener("keypress", function(e) {
+        if (e.keyCode == 13) {
+          UI_helper.setEnabled(false);
+        }
+      });
+
+      UI_helper.setDriveMode = function(mode) {
+        simulation.Robot._mode = mode;
+        UI_helper.setEnabled(false);
+
+        DSUI_mode_select_btn_teleop_DOM.classList.remove("selected");
+        DSUI_mode_select_btn_auto_DOM.classList.remove("selected");
+        DSUI_mode_select_btn_practice_DOM.classList.remove("selected");
+        DSUI_mode_select_btn_test_DOM.classList.remove("selected");
+
+        switch (mode) {
+          case 2:
+            DSUI_mode_select_btn_teleop_DOM.classList.add("selected"); break;
+          case 1:
+            DSUI_mode_select_btn_auto_DOM.classList.add("selected"); break;
+          case 0:
+            DSUI_mode_select_btn_practice_DOM.classList.add("selected"); break;
+          case 3:
+            DSUI_mode_select_btn_test_DOM.classList.add("selected"); break;
+        }
+      }
+      DSUI_mode_select_btn_teleop_DOM.addEventListener("click", function(e) {
+        UI_helper.setDriveMode(2);
+      });
+      DSUI_mode_select_btn_auto_DOM.addEventListener("click", function(e) {
+        UI_helper.setDriveMode(1);
+      });
+      DSUI_mode_select_btn_practice_DOM.addEventListener("click", function(e) {
+        UI_helper.setDriveMode(0);
+      });
+      DSUI_mode_select_btn_test_DOM.addEventListener("click", function(e) {
+        UI_helper.setDriveMode(3);
+      });
+
+
+      UI_helper.update = function() {
+        if (navigator.getGamepads()[0] == null) {
+          DCUI_joystick_connection_light_DOM.classList.add("red");
+          DCUI_joystick_connection_light_DOM.classList.remove("green");
+        } else {
+          console.log(navigator.getGamepads()[0].buttons)
+          DCUI_joystick_connection_light_DOM.classList.add("green");
+          DCUI_joystick_connection_light_DOM.classList.remove("red");
+        }
+
+        
+        if (simulation.Robot.isEnabled()) {
+          let t = last_time - UI_helper.time_enabled;
+          let sec = (t % 60).toFixed(2);
+          let min = Math.floor(t / 60);
+          if (sec < 10)
+            sec = "0" + sec;
+          if (min < 10)
+            min = "0" + min;
+          DSUI_elapsed_time_text_DOM.innerHTML = min+":"+sec;
+        }
+      }
+      
+
+
+
+    //=======================
+
+
+			init();
+      //initRender(0);
+
+			function init() {
+
+		    cameras.push(new THREE.PerspectiveCamera(45, 16/9, .1, 100));
+		    cameras[0].position.set(14, 6, 0);
+
+
+        scene = new THREE.Scene();
+
+				var ambientLight = new THREE.AmbientLight(0xcccccc, 0.8);
+				scene.add(ambientLight);
+
+        
+				scene.add(cameras[0]);
+        
+        
+        var object;
+        
+        // model
+        /*
+				var onProgress = function ( xhr ) {
+          if ( xhr.lengthComputable ) {
+            var percentComplete = xhr.loaded / xhr.total * 100;
+            console.log( Math.round( percentComplete, 2 ) + '% downloaded' );
+          }
+          };
+          var onError = function () { };
+          var manager = new THREE.LoadingManager();
+          manager.addHandler( /\.dds$/i, new DDSLoader() );
+          // comment in the following line and import TGALoader if your asset uses TGA textures
+          // manager.addHandler( /\.tga$/i, new TGALoader() );
+          new MTLLoader( manager )
+          .setPath("assets/models/field/")
+          .load("field.mtl", function (materials) {
+            materials.preload();
+            new OBJLoader( manager )
+              .setMaterials( materials )
+              .setPath("assets/models/field/")
+              .load("field.obj", function ( object ) {
+                object.position.y = - 95;
+                scene.add( object );
+              }, onProgress, onError );
+          } );
+          */
+
+        // ================================================
+        // load field
+        new RGBELoader().setDataType(THREE.UnsignedByteType).load("assets/environments/quarry_01_1k.hdr", function (texture) {
+						var envMap = pmremGenerator.fromEquirectangular(texture).texture;
+						//scene.background = envMap;
+						//scene.environment = envMap;
+						texture.dispose();
+						pmremGenerator.dispose();
+
+						// model
+						// use of RoughnessMipmapper is optional
+						var roughnessMipmapper = new RoughnessMipmapper(renderer);
+
+						var loader = new GLTFLoader();
+						loader.load("assets/models/field/field.glb", function(gltf) {
+							gltf.scene.traverse(function(child) {
+								if (child.isMesh) {
+									roughnessMipmapper.generateMipmaps(child.material);
+								}
+							});
+							scene.add(gltf.scene);
+							// window.gltf.children[2].children[1].skeleton.bones
+							roughnessMipmapper.dispose();
+						});
+        });
+
+        // ================================================  
+        // load robot object
+				new RGBELoader().setDataType(THREE.UnsignedByteType).load("assets/environments/quarry_01_1k.hdr", function (texture) {
+          var envMap = pmremGenerator.fromEquirectangular(texture).texture;
+          scene.background = envMap;
+          scene.environment = envMap;
+
+          texture.dispose();
+          pmremGenerator.dispose();
+
+          // model
+          // use of RoughnessMipmapper is optional
+          var roughnessMipmapper = new RoughnessMipmapper(renderer);
+          var loader = new GLTFLoader();
+          loader.load("assets/models/bot/2020bot.glb", function(gltf) {
+            gltf.scene.traverse(function(child) {
+              if (child.isMesh) {
+                roughnessMipmapper.generateMipmaps(child.material);
+              }
+
+            });
+
+            
+            scene.add(gltf.scene);
+            window.gltf = gltf.scene;
+
+            let drivercam = new THREE.PerspectiveCamera(60, 16/9, .1, 100);
+            
+            drivercam.position.set(0, 0.3, 0);
+            bot_object = gltf.scene.children[0];
+            bot_object.add(drivercam);
+            cameras.push(drivercam);
+            
+            var pointLight = new THREE.SpotLight(0x00FF00, 0.6, 0, 0.08*Math.PI, 0.5);
+            pointLight.position.set(0, 0.6, 0.6);
+            pointLight.target.position.set(0, 0.6, 0);
+            bot_object.add(pointLight.target);
+            bot_object.add(pointLight);
+
+
+            // window.gltf.children[2].children[1].skeleton.bones
+            roughnessMipmapper.dispose();
+						});
+
+        });
+
+        let renderer = new THREE.WebGLRenderer({canvas: document.getElementById("field_camera_DOM"), antialias: false});
+				renderer.setPixelRatio(window.devicePixelRatio);
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMappingExposure = 0.8;
+				renderer.outputEncoding = THREE.sRGBEncoding;
+        renderers.field = renderer;
+
+        let renderer1 = new THREE.WebGLRenderer({canvas: document.getElementById("driver_camera_DOM"), antialias: false});
+				renderer1.setPixelRatio(window.devicePixelRatio);
+				renderer1.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer1.toneMappingExposure = 0.8;
+				renderer1.outputEncoding = THREE.sRGBEncoding;
+        renderers.botcam = renderer1;
+
+				var pmremGenerator = new THREE.PMREMGenerator(renderer);
+				pmremGenerator.compileEquirectangularShader();
+
+				controls = new OrbitControls(cameras[0], renderers.field.domElement);
+				controls.minDistance = 0.1;
+				controls.maxDistance = 100000;
+				controls.target.set(0, 0, -0.2);
+				controls.update();
+
+
+			}
+
+      
+      function resizeRendererToDisplaySize(renderer) {
+        const canvas = renderer.domElement;
+        const width = canvas.clientWidth;
+        const height = canvas.clientHeight;
+        const needResize = canvas.width !== width || canvas.height !== height;
+        if (needResize) {
+          renderer.setSize(width, height, false);
+        }
+        return needResize;
+      }
+
+
+      var render = function(t) {
+        t *= 0.001;
+        var dt = t - last_time;
+        last_time = t;
+        simulation.update(dt);
+
+        if (bot_object) {
+          bot_object.position.set(simulation.wpos.x, simulation.wpos.z, -simulation.wpos.y);
+          bot_object.rotation.set(simulation.rpos.x, simulation.rpos.z, simulation.rpos.y);
+        }
+        
+        if (resizeRendererToDisplaySize(renderers.field)) {
+          cameras[0].aspect = renderers.field.domElement.clientWidth / renderers.field.domElement.clientHeight;
+          cameras[0].updateProjectionMatrix();
+        }
+
+        
+        renderers.field.render(scene, cameras[0]);
+
+        if (cameras.length == 2)
+        renderers.botcam.render(scene, cameras[1]);
+      
+
+
+				UI_helper.update();
+
+        requestAnimationFrame(render);
+      }
+
+
+      export function findComponent(component, tag){
+        if (component.name == tag) {
+          return component;
+        }        
+        for (var i=0; i<component.children.length; i+=1) {
+          let result = findComponent(component.children[i], tag);
+          if (result) {
+            return result;
+          }
+        }
+        return null;
+      }
+      window.findComponent = findComponent;
+
+      simulation.Robot._robotInit();
+
+      render(0);
+
+      setTimeout(function() {
+        document.querySelector(".loading").style.webkitAnimationPlayState = "paused";
+        document.querySelector(".intro").style.animation = "fadeout 0.8s linear forwards";
+        setTimeout(function() {document.querySelector(".intro").style.display = "none";}, 800);
+      }, 5000);
+
+      function loadConfig() {
+          var rawFile = new XMLHttpRequest();
+          rawFile.open("GET", "/config.json", false);
+          rawFile.onreadystatechange = function () {
+              if(rawFile.readyState === 4) {
+                  if(rawFile.status === 200 || rawFile.status == 0) {
+                      global = JSON.parse(rawFile.responseText);
+                      window.global = global;
+                      console.log("Config file loaded", global);
+                  }
+              }
+          }
+          rawFile.send(null);
+      }
+      loadConfig();
+
+      function loadFile(file, DOM_element)
+      {
+          var rawFile = new XMLHttpRequest();
+          rawFile.open("GET", file, false);
+          rawFile.onreadystatechange = function ()
+          {
+              if(rawFile.readyState === 4)
+              {
+                  if(rawFile.status === 200 || rawFile.status == 0)
+                  {
+                      var allText = rawFile.responseText;
+                      DOM_element.innerHTML = allText;
+                  }
+              }
+          }
+          rawFile.send(null);
+      }
+      loadFile("/src/main/javascript/frc/Robot.js", Robot_code_DOM);
+
+
+
+
+
+      dragElement(document.getElementById("Robot_code"));
+
+  function dragElement(elmnt) {
+    var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+    if (document.getElementById(elmnt.id + "-topbar")) {
+      // if present, the header is where you move the DIV from:
+      document.getElementById(elmnt.id + "-topbar").onmousedown = dragMouseDown;
+    } else {
+      // otherwise, move the DIV from anywhere inside the DIV:
+      elmnt.onmousedown = dragMouseDown;
+    }
+
+    function dragMouseDown(e) {
+      e = e || window.event;
+      e.preventDefault();
+      // get the mouse cursor position at startup:
+      pos3 = e.clientX;
+      pos4 = e.clientY;
+      document.onmouseup = closeDragElement;
+      // call a function whenever the cursor moves:
+      document.onmousemove = elementDrag;
+    }
+
+    function elementDrag(e) {
+      e = e || window.event;
+      e.preventDefault();
+      // calculate the new cursor position:
+      pos1 = pos3 - e.clientX;
+      pos2 = pos4 - e.clientY;
+      pos3 = e.clientX;
+      pos4 = e.clientY;
+      // set the element's new position:
+      elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+      elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+    }
+
+    function closeDragElement() {
+      // stop moving when mouse button is released:
+      document.onmouseup = null;
+      document.onmousemove = null;
+    }
+  }
+
+
+		</script>
+
+	</body>
+</html>
