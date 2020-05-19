@@ -4,13 +4,14 @@
  * 在此处初始化控制手柄，并将手柄按键对应到机器人任务 (command) 上面。
  */
 
-import KeyboardController from "/ga/supernovarobotics/first/spilibj/KeyboardController.js";
-import XboxController from "/ga/supernovarobotics/first/spilibj/XboxController.js";
-import GenericHID from "/ga/supernovarobotics/first/spilibj/GenericHID.js";
+import KeyboardController from "https://github-content-1254078456.cos.ap-beijing.myqcloud.com/ARVISS/ga/supernovarobotics/first/spilibj/KeyboardController.js";
+import XboxController from "https://github-content-1254078456.cos.ap-beijing.myqcloud.com/ARVISS/ga/supernovarobotics/first/spilibj/XboxController.js";
+import GenericHID from "https://github-content-1254078456.cos.ap-beijing.myqcloud.com/ARVISS/ga/supernovarobotics/first/spilibj/GenericHID.js";
 
 class OI {
   /* initialize two Xbox controller with id 0 and 1 on DS */
   stick_0 = new XboxController(0);
+  keyboard_0 = new KeyboardController(0);
 
   joystick_threshold = 0.15;
 
@@ -73,7 +74,7 @@ class OI {
     }
     return val;
   }
-
+  
   getDriveAxis() {
     var result = [
       this.unify(-this.stick_0.getY(GenericHID.Hand.kLeft)), 

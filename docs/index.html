@@ -4,8 +4,8 @@
 		<title>ARVIS | Supernova Robotics</title>
 		<meta charset="utf-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <script src="/assets/js/utils.js"></script>
-    <script src="/assets/js/matmath.js"></script>
+    <script src="https://github-content-1254078456.cos.ap-beijing.myqcloud.com/ARVISS/assets/js/utils.js"></script>
+    <script src="https://github-content-1254078456.cos.ap-beijing.myqcloud.com/ARVISS/assets/js/matmath.js"></script>
     <style>
       :root {
         --grey-000: #000000;
@@ -235,6 +235,7 @@
       }
 
 
+
     </style>
 	</head>
 
@@ -313,20 +314,20 @@
       console.log("World coordinate:\n|z\n|\n|\n|______ y\n \\\n  \\\n   \\x");
 
 
-			import * as THREE from "/assets/js/three.module.js";
+			import * as THREE from "https://github-content-1254078456.cos.ap-beijing.myqcloud.com/ARVISS/assets/js/three.module.js";
 
-			import {OrbitControls} from "/assets/js/OrbitControls.js";
-			import {GLTFLoader} from "/assets/js/GLTFLoader.js";
-			import {RGBELoader} from "/assets/js/RGBELoader.js";
-      import {RoughnessMipmapper} from "/assets/js/RoughnessMipmapper.js";
+			import {OrbitControls} from "https://github-content-1254078456.cos.ap-beijing.myqcloud.com/ARVISS/assets/js/OrbitControls.js";
+			import {GLTFLoader} from "https://github-content-1254078456.cos.ap-beijing.myqcloud.com/ARVISS/assets/js/GLTFLoader.js";
+			import {RGBELoader} from "https://github-content-1254078456.cos.ap-beijing.myqcloud.com/ARVISS/assets/js/RGBELoader.js";
+      import {RoughnessMipmapper} from "https://github-content-1254078456.cos.ap-beijing.myqcloud.com/ARVISS/assets/js/RoughnessMipmapper.js";
       
-			import {OBJLoader} from "/assets/js/OBJLoader.js";
-			import {MTLLoader} from "/assets/js/MTLLoader.js";
-      import {DDSLoader} from "/assets/js/DDSLoader.js";
+			import {OBJLoader} from "https://github-content-1254078456.cos.ap-beijing.myqcloud.com/ARVISS/assets/js/OBJLoader.js";
+			import {MTLLoader} from "https://github-content-1254078456.cos.ap-beijing.myqcloud.com/ARVISS/assets/js/MTLLoader.js";
+      import {DDSLoader} from "https://github-content-1254078456.cos.ap-beijing.myqcloud.com/ARVISS/assets/js/DDSLoader.js";
       
 
-      import RobotSimulator from "/src/main/javascript/frc/Main.js";
-      import CallibProcessor from "/ga/supernovarobotics/first/spilibj/CallibProcessor.js";
+      import RobotSimulator from "https://github-content-1254078456.cos.ap-beijing.myqcloud.com/ARVISS/src/main/javascript/frc/Main.js";
+      import CallibProcessor from "https://github-content-1254078456.cos.ap-beijing.myqcloud.com/ARVISS/ga/supernovarobotics/first/spilibj/CallibProcessor.js";
       window.CallibProcessor = CallibProcessor;
 
 			var container, controls;
@@ -491,7 +492,7 @@
 
         // ================================================
         // load field
-        new RGBELoader().setDataType(THREE.UnsignedByteType).load("assets/environments/quarry_01_1k.hdr", function (texture) {
+        new RGBELoader().setDataType(THREE.UnsignedByteType).load("https://github-content-1254078456.cos.ap-beijing.myqcloud.com/ARVISS/assets/environments/quarry_01_1k.hdr", function (texture) {
 						var envMap = pmremGenerator.fromEquirectangular(texture).texture;
 						//scene.background = envMap;
 						//scene.environment = envMap;
@@ -503,7 +504,7 @@
 						var roughnessMipmapper = new RoughnessMipmapper(renderer);
 
 						var loader = new GLTFLoader();
-						loader.load("assets/models/field/field.glb", function(gltf) {
+						loader.load("https://github-content-1254078456.cos.ap-beijing.myqcloud.com/ARVISS/assets/models/field/field.glb", function(gltf) {
 							gltf.scene.traverse(function(child) {
 								if (child.isMesh) {
 									roughnessMipmapper.generateMipmaps(child.material);
@@ -517,7 +518,7 @@
 
         // ================================================  
         // load robot object
-				new RGBELoader().setDataType(THREE.UnsignedByteType).load("assets/environments/quarry_01_1k.hdr", function (texture) {
+				new RGBELoader().setDataType(THREE.UnsignedByteType).load("https://github-content-1254078456.cos.ap-beijing.myqcloud.com/ARVISS/assets/environments/quarry_01_1k.hdr", function (texture) {
           var envMap = pmremGenerator.fromEquirectangular(texture).texture;
           scene.background = envMap;
           scene.environment = envMap;
@@ -529,7 +530,7 @@
           // use of RoughnessMipmapper is optional
           var roughnessMipmapper = new RoughnessMipmapper(renderer);
           var loader = new GLTFLoader();
-          loader.load("assets/models/bot/2020bot.glb", function(gltf) {
+          loader.load("https://github-content-1254078456.cos.ap-beijing.myqcloud.com/ARVISS/assets/models/bot/2020bot.glb", function(gltf) {
             gltf.scene.traverse(function(child) {
               if (child.isMesh) {
                 roughnessMipmapper.generateMipmaps(child.material);
@@ -652,11 +653,11 @@
         document.querySelector(".loading").style.webkitAnimationPlayState = "paused";
         document.querySelector(".intro").style.animation = "fadeout 0.8s linear forwards";
         setTimeout(function() {document.querySelector(".intro").style.display = "none";}, 800);
-      }, 5000);
+      }, 7000);
 
       function loadConfig() {
           var rawFile = new XMLHttpRequest();
-          rawFile.open("GET", "/config.json", false);
+          rawFile.open("GET", "https://raw.githubusercontent.com/Supernova-Robotics/ARVISS/master/config.json", false);
           rawFile.onreadystatechange = function () {
               if(rawFile.readyState === 4) {
                   if(rawFile.status === 200 || rawFile.status == 0) {
@@ -687,7 +688,7 @@
           }
           rawFile.send(null);
       }
-      loadFile("/src/main/javascript/frc/Robot.js", Robot_code_DOM);
+      loadFile("https://github-content-1254078456.cos.ap-beijing.myqcloud.com/ARVISS/src/main/javascript/frc/Robot.js", Robot_code_DOM);
 
 
 
